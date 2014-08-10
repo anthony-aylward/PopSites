@@ -1,0 +1,109 @@
+\title{Documentation for \texttt{pop{\textunderscore}sites.py}}
+\date{}
+\documentclass[12pt]{scrartcl}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{graphicx}
+\usepackage{courier}
+\usepackage{tikz}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\begin{document}
+\maketitle
+\section{Description}
+\texttt{pop{\textunderscore}sites.py} is a python script that attempts to  identify population-specific SNP sites present in an input set of SNP sites or genes. 
+\section{Usage}
+\begin{verbatim}
+python3 pop_sites.py [-h] [-b BUFF] -f FDR [-g GTF] -i INPATH -p POP
+                     (-c | -r REP)
+\end{verbatim}
+Below is an illustration of \texttt{pop{\textunderscore}sites.py}'s usage in the form of a shell script for use on TSCC.
+\begin{verbatim}
+#!/bin/bash
+# Identify population-specific SNP sites from an input set of sites.
+python3 ~/PopSites/pop_sites.py \
+--buff 1000 \
+--fdr 0.05 \
+--gtf ~/PopSites/GTF/hg19_genes.gtf \
+--inpath ~/PopSites/Data/HPG_genes_with_sites_after_constraint9.txt \
+--pop CEU \
+--rep 100
+exit
+\end{verbatim}
+\texttt{pop{\textunderscore}sites.py} assumes that it is found in the directory
+\begin{quote}
+\begin{verbatim}
+~/PopSites/pop_sites.py
+\end{verbatim}
+\end{quote}
+
+\section{Arguments}
+\begin{description}
+\item[\texttt{BUFF}] Size of buffer around sites or genes
+\item[\texttt{FDR}] False discovery rate for population-specific SNP sites
+\item[\texttt{GTF}] Path to the .gtf file used for gene-coordinate conversion
+\item[\texttt{INPATH}] Path to the input .txt containing slicing data
+\item[\texttt{POP}] Population or superpopulation to test, e.g. CEU or EUR
+\item[\texttt{CHISQ}] Use a chi-squared test to identify population-specific SNPs
+\item[\texttt{REP}] Number of replicates to permute when constructing empirical probability distributions
+\end{description}
+\section{Details}
+
+The task executed by \texttt{pop{\textunderscore}sites.py} can be divided into ten steps:
+
+\begin{enumerate}
+\item \underline{Subsetting the population panel.}
+
+\texttt{pop{\textunderscore}sites.py} downloads the population panel file and extracts a new panel including only the samples from the population designated by \texttt{--pop}.
+
+\item \underline{Parsing site inputs and converting them to \texttt{tabix} input format.}
+
+This step generates a \texttt{.txt} file including all of the regions designated in the input \texttt{.txt} file and formatted to be fed into tabix. Each line of the new file has the following format: \texttt{chrom:start-end}. This step also pads each region with the buffer designated by \texttt{--buff}.
+
+\item \underline{Parsing gene inputs and converting them to tabix input format.}
+
+If the input \texttt{.txt} file is a list of genes, \texttt{pop{\textunderscore}sites.py} uses the \texttt{.gtf} file designated by \texttt{--gtf} to convert the genes to absolute coordinates before moving on to step 2.
+
+\item \underline{Executing tabix on the formatted inputs.}
+
+This step carries out the following commands:
+\begin{verbatim}
+tabix -fh vcf chr1:1 > PREFIX.vcf
+xargs -a PREFIX_tabix.txt -I {} tabix -f vcf {} >> PREFIX.vcf
+\end{verbatim}
+The first line creates an empty \texttt{.vcf} file and adds header information. The second line calls tabix to download a sliced version of the 1000 genomes variant calls data, including only the regions given as input, and write it to the initialized file.
+
+\item \underline{Subsetting the population-specific VCF data.}
+
+This step uses vcf-subset to generate two new \texttt{.vcf} files from the \texttt{.vcf} produced in the previous step: one file including all samples but pruned of unusable data, and a second file including data from the samples of the input population only. 
+
+\item \underline{Computing allele frequencies with vcftools.}
+
+This step uses vcftools to compute global and population-specific allele freqencies for each SNP site in the input regions, outputting one .frq file for each of the two subsetted .vcf files produced by the previous step.
+
+\item \underline{Identifying population-specific SNPs and genes via chi-squared test.}
+
+This optional step uses a parametric chi-squared test to compute a p-value
+for each SNP site against the null hypothesis that the site is not specific to the input population. Using the parametric test is faster than the permutation test, but inaccurate. This step occurs only if the \texttt{--chisq} option is used.
+
+\item \underline{Constructing empirical frequency distributions.}
+
+A number of times indicated by \texttt{--rep}, this step takes a subset from the grand population that is random but equal in size to the input population given by \texttt{--pop}. It computes allele frequencies for each SNP site in the input regions on the random population, and records the results.
+
+\item \underline{Identifying population-specific SNPs and genes via permutation test.}
+
+This step uses the data from the previous step to construct, for each SNP site in the input regions, an empirical distribution for the chi-squared statistic using the grand population frequency data as expected values. Using the empirical distribution, it computes a p-value for each SNP site's frequency data on the input population given by \texttt{--pop} (\texttt{EUR}, \texttt{CEU}, etc).
+
+\item \underline{Cleaning up.}
+
+This step deletes temporary files generated during the previous steps.
+\end{enumerate}
+\section{Value}
+When the hypothesis tests are complete,  \texttt{pop{\textunderscore}sites.py} writes a tab-delimited file called \texttt{PREFIX{\textunderscore}verdict.txt} where \texttt{PREFIX} is the prefix (path without file extension)  to the input \texttt{.txt} file. This output file contains, for each SNP site listed in the input file (or each site within one of the genes listed in the input), a p-value and a verdict of \texttt{POP-SPECIFIC} or \texttt{INCONCLUSIVE}. Each line of the output file has format:
+
+\begin{verbatim}
+SITE    P-VALUE    VERDICT
+\end{verbatim}
+\end{document}
