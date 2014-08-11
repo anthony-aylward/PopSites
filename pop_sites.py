@@ -22,6 +22,9 @@ import os
 import random
 import numpy
 from scipy import stats
+from __future__ import division
+from __future__ import print_function
+from __future__ import with_statment
 
 
 
