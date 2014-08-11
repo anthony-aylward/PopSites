@@ -1,5 +1,4 @@
 #!/bin/bash
-module use /nfs/01/username/local/share/modulefiles
 export PATH=/opt/python/bin:$PATH
 export PYTHONPATH=/home/jpg/opt/python/lib/python2.7/site-packages:$PYTHONPATH
 python ~/PopSites/pop_sites.py \
