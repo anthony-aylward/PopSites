@@ -14,9 +14,6 @@
 
 
 # Firstly, import dependencies.
-from __future__ import division
-from __future__ import print_function
-from __future__ import with_statement
 import argparse
 import csv
 import ftplib
@@ -504,7 +501,7 @@ def empirical_dist(inpath, pop, rep):
             
    # Initialize the empirical distribution file and write the header.
 
-    with open(dist_path, 'w') as csv_file:
+    with open(dist_path, 'w', newline='') as csv_file:
         dist_writer = csv.writer(csv_file, 
                                 delimiter = ',',
                                 quotechar='"',
