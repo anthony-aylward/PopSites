@@ -615,7 +615,7 @@ def permutation_test(fdr, inpath, pop, rep):
     all_frq = inpath[::-1][4:][::-1]+'_'+'ALL'+'.frq'
     pop_frq = inpath[::-1][4:][::-1]+'_'+pop+'.frq'
     dist_path = inpath[::-1][4:][::-1]+'_dist.csv'
-    verdict_path = inpath[::-1][4:][::-1]+'_verdict.txt'
+    verdict_path = inpath[::-1][4:][::-1]+pop+'_verdict.txt'
             
     # Construct a dictionary keying each site listed in all_frq (grand
     # population frequency file) to its computed frequency values.

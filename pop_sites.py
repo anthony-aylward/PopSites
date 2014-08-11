@@ -263,9 +263,9 @@ def execute_tabix(inpath):
     # Call tabix on the converted list of genomic regions, using xargs to 
     # feed in the inputs.
                           
-    os.system(' '.join([tabix,
+    os.system(' '.join(['xargs',
                         '-a', inpath[::-1][4:][::-1]+'_tabix.txt','-I', '{}',
-                        'tabix',
+                        tabix,
                         '-f', vcf, '{}','>>', inpath[::-1][4:][::-1]+'.vcf'
                        ]))
 
