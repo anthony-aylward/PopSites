@@ -252,7 +252,7 @@ def execute_tabix(inpath):
     
     # Locate tabix 
     
-    tabix = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]), 'tabix'])
+    tabix = '~/local/src/tabix-0.2.3/tabix'
     
     # Use tabix to generate a header.
     
@@ -282,9 +282,7 @@ def subset_vcf(inpath, pop):
     
     # Locate vcf-subset
     
-    vcf_subset = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]),
-                           'vcf-subset'
-                          ])
+    vcf_subset = '~/local/src/vcftools_0.1.4a/bin/vcf-subset'
 
     # Indicate the location of the full and subsetted population panels.
     
@@ -337,12 +335,9 @@ def compute_frequencies(inpath, pop):
     
     # Locate vcf-sort and vcftools
     
-    vcf_sort = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]),
-                         'vcf-sort'
-                        ])
-    vcftools = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]),
-                         'vcftools'
-                        ])
+    vcf_sort = '~/local/src/vcftools_0.1.4a/bin/vcf-sort'
+    
+    vcftools = '~/local/src/vcftools_0.1.4a/cpp/vcftools'
     
     # Sort the full .vcf file and compute allele frequencies.
     
@@ -487,12 +482,9 @@ def empirical_dist(inpath, pop, rep):
     
     # Locate vcf-subset and vcftools
     
-    vcf_subset = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]),
-                           'vcf-subset'
-                          ])
-    vcftools = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]),
-                         'vcftools'
-                        ])
+    vcf_subset = '~/local/src/vcftools_0.1.4a/bin/vcf-subset'
+    
+    vcftools = '~/local/src/vcftools_0.1.4a/cpp/vcftools'
     
     # Identify a few important filenames.
     
