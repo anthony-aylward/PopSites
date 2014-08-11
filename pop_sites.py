@@ -250,16 +250,20 @@ def execute_tabix(inpath):
                    'ALL.2of4intersection.20100804.genotypes.vcf.gz'
                   ])
     
+    # Locate tabix 
+    
+    tabix = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]), 'tabix'])
+    
     # Use tabix to generate a header.
     
-    os.system(' '.join(['tabix',
+    os.system(' '.join([tabix,
                         '-fh', vcf, 'chr1:1','>', inpath[::-1][4:][::-1]+'.vcf'
                        ]))
     
     # Call tabix on the converted list of genomic regions, using xargs to 
     # feed in the inputs.
                           
-    os.system(' '.join(['xargs',
+    os.system(' '.join([tabix,
                         '-a', inpath[::-1][4:][::-1]+'_tabix.txt','-I', '{}',
                         'tabix',
                         '-f', vcf, '{}','>>', inpath[::-1][4:][::-1]+'.vcf'
@@ -275,6 +279,12 @@ def execute_tabix(inpath):
 def subset_vcf(inpath, pop):
 
     print('Subsetting the .vcf file with vcf-subset.')
+    
+    # Locate vcf-subset
+    
+    vcf_subset = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]),
+                           'vcf-subset'
+                          ])
 
     # Indicate the location of the full and subsetted population panels.
     
@@ -304,12 +314,12 @@ def subset_vcf(inpath, pop):
     # NAN frequencies ommitted and a subsetted .vcf file containing data on the
     # input population only.
     
-    os.system(' '.join(['vcf-subset',
+    os.system(' '.join([vcf_subset,
                         '-c', all_samples,
                         inpath[::-1][4:][::-1]+'.vcf',
                         '>', inpath[::-1][4:][::-1]+'_'+'ALL'+'.vcf'
                        ]))
-    os.system(' '.join(['vcf-subset',
+    os.system(' '.join([vcf_subset,
                         '-c', pop_samples,
                         inpath[::-1][4:][::-1]+'.vcf',
                         '>', inpath[::-1][4:][::-1]+'_'+pop+'.vcf'
@@ -325,14 +335,23 @@ def subset_vcf(inpath, pop):
 def compute_frequencies(inpath, pop):
     print('Computing allele frequencies with vcftools')
     
+    # Locate vcf-sort and vcftools
+    
+    vcf_sort = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]),
+                         'vcf-sort'
+                        ])
+    vcftools = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]),
+                         'vcftools'
+                        ])
+    
     # Sort the full .vcf file and compute allele frequencies.
     
-    os.system(' '.join(['vcf-sort', 
+    os.system(' '.join([vcf_sort, 
                         inpath[::-1][4:][::-1]+'_'+'ALL'+'.vcf',
                         '>', 
                         inpath[::-1][4:][::-1]+'_'+'ALL'+'_sort.vcf'
                        ]))
-    os.system(' '.join(['vcftools',
+    os.system(' '.join([vcftools,
                         '--vcf', inpath[::-1][4:][::-1]+'_'+'ALL'+'_sort.vcf',
                         '--freq',
                         '--out', inpath[::-1][4:][::-1]+'_'+'ALL'
@@ -340,12 +359,12 @@ def compute_frequencies(inpath, pop):
                        
     # Sort the population-subsetted .vcf file and compute allele frequencies.                   
                        
-    os.system(' '.join(['vcf-sort', 
+    os.system(' '.join([vcf_sort, 
                         inpath[::-1][4:][::-1]+'_'+pop+'.vcf',
                         '>', 
                         inpath[::-1][4:][::-1]+'_'+pop+'_sort.vcf'
                        ]))
-    os.system(' '.join(['vcftools',
+    os.system(' '.join([vcftools,
                         '--vcf', inpath[::-1][4:][::-1]+'_'+pop+'_sort.vcf',
                         '--freq',
                         '--out', inpath[::-1][4:][::-1]+'_'+pop
@@ -465,6 +484,15 @@ def chi_squared_test(fdr, inpath, pop):
 
 def empirical_dist(inpath, pop, rep):
     print('Sampling for empirical frequency distributions.')
+    
+    # Locate vcf-subset and vcftools
+    
+    vcf_subset = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]),
+                           'vcf-subset'
+                          ])
+    vcftools = '/'.join(['/'.join(inpath.split('/')[::-1][1:][::-1]),
+                         'vcftools'
+                        ])
     
     # Identify a few important filenames.
     
@@ -587,7 +615,7 @@ def permutation_test(fdr, inpath, pop, rep):
     all_frq = inpath[::-1][4:][::-1]+'_'+'ALL'+'.frq'
     pop_frq = inpath[::-1][4:][::-1]+'_'+pop+'.frq'
     dist_path = inpath[::-1][4:][::-1]+'_dist.csv'
-    verdict_path = inpath[::-1][4:][::-1]+'_verdict.txt'
+    verdict_path = inpath[::-1][4:][::-1]+pop+'_verdict.txt'
             
     # Construct a dictionary keying each site listed in all_frq (grand
     # population frequency file) to its computed frequency values.
