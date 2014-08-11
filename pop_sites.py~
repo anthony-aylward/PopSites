@@ -757,35 +757,35 @@ def clean_up(inpath, pop):
 
 # Extract a specific population from the population panel.
 
-#subset_pop(args.pop)
+subset_pop(args.pop)
 
 # Decide between sites and genes and convert the input to tabix input format.
 
-#if args.gtf == None:
-#    convert_sites(args.inpath, args.buff)
-#else:
-#    convert_genes(args.inpath, args.gtf, args.buff)
+if args.gtf == None:
+    convert_sites(args.inpath, args.buff)
+else:
+    convert_genes(args.inpath, args.gtf, args.buff)
     
 # Execute tabix, generating a horizontally sliced .vcf file.
 
-#execute_tabix(args.inpath)
+execute_tabix(args.inpath)
 
 # Generate a population-subsetted (vertically sliced) .vcf file.
 
-#subset_vcf(args.inpath, args.pop)
+subset_vcf(args.inpath, args.pop)
 
 # Compute allele frequencies on the full (horizontally sliced) and subsetted 
 # (horizontally and vertically sliced) .vcf files.
 
-#compute_frequencies(args.inpath, args.pop)
+compute_frequencies(args.inpath, args.pop)
 
 # Identify population specific sites via chi-squared test or permutation test
 
-#if args.chisq:
-#    chi_squared_test(args.fdr, args.inpath, args.pop)
-#else:
-#    empirical_dist(args.inpath, args.pop, args.rep)
-#    permutation_test(args.fdr, args.inpath, args.pop, args.rep)
+if args.chisq:
+    chi_squared_test(args.fdr, args.inpath, args.pop)
+else:
+    empirical_dist(args.inpath, args.pop, args.rep)
+    permutation_test(args.fdr, args.inpath, args.pop, args.rep)
     
 # Remove temporary files.
 
