@@ -1,6 +1,10 @@
 #!/bin/bash
 # Identify population-specific SNP sites from an input set of sites.
-python3 ~/PopSites/pop_sites.py \
+<<<<<<< HEAD
+opt/python/bin/python3 ~/PopSites/pop_sites.py \
+=======
+./opt/python/bin/python3 ~/PopSites/pop_sites.py \
+>>>>>>> 3a9b44b00e12f1676936727fe82bbf8900bd3da1
 --buff 500 \
 --fdr 0.05 \
 --inpath ~/Data/test.txt \
